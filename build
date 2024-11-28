@@ -1,0 +1,37 @@
+#!/bin/bash
+
+usage()  { printf "Usage: $0 [-q <0|1>] \nq=1 is used to test quick runs\n" 1>&2; exit 1; }
+
+q=0
+d=0
+quickflag=-DQUICK
+debugflag=-g
+
+while getopts ":d:q:" o; do
+    case "${o}" in
+        d)
+            d=${OPTARG}
+            ((d == 0 || d == 1)) || usage
+            ;;
+        q)
+            q=${OPTARG}
+            ((q == 0 || q == 1)) || usage
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+if [ $q -eq 0 ]
+then
+    quickflag=
+fi
+
+if [ $d -eq 0 ]
+then
+    debugflag=
+fi
+
+echo "build flags: ${quickflag} ${debugflag}"
+gcc cbench.c -o runBench ${quickflag}  -lsodium -lnettle -lcrypto -O3 ${debugflag}
